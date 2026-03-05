@@ -1,76 +1,110 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>ЯСамаяПи******</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f0f0f0; }
-        .container { max-width: 800px; margin: 20px auto; padding: 15px; }
-        .video-preview { width: 100%; margin: 10px 0; }
-        .btn { padding: 12px 24px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; background: #4CAF50; color: white; }
-        .camera-section { text-align: center; margin: 20px 0; }
-        .response-item { background: white; padding: 10px; margin: 10px 0; border-radius: 5px; }
-        #ban-message { display: none; text-align: center; font-size: 18px; color: red; padding: 20px; }
-        .tab { padding: 10px; cursor: pointer; border: 1px solid #ddd; display: inline-block; }
-        .active-tab { background: #4CAF50; color: white; }
-        .tab-content { display: none; padding: 20px; border: 1px solid #ddd; margin-top: 10px; }
-        .login-form { text-align: center; padding: 20px; }
-    </style>
+  <meta charset="UTF-8">
+  <title>ЯСамаяПи</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f0f0f0; }
+    .container { max-width: 800px; margin: 20px auto; padding: 15px; }
+    .video-preview { width: 100%; margin: 10px 0; }
+    .btn { padding: 12px 24px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; background: #4CAF50; color: white; }
+    .camera-section { text-align: center; margin: 20px 0; }
+    .response-item { background: white; padding: 10px; margin: 10px 0; border-radius: 5px; }
+    #ban-message { display: none; text-align: center; font-size: 18px; color: red; padding: 20px; }
+    .tab { padding: 10px; cursor: pointer; border: 1px solid #ddd; display: inline-block; }
+    .active-tab { background: #4CAF50; color: white; }
+    .tab-content { display: none; padding: 20px; border: 1px solid #ddd; margin-top: 10px; }
+    .login-form, .register-form { text-align: center; padding: 20px; background: white; border-radius: 5px; margin-bottom: 20px; }
+    .form-group { margin: 10px 0; text-align: left; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+    .form-group input { padding: 8px; width: 100%; border: 1px solid #ddd; border-radius: 3px; }
+    .user-card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; background: white; }
+  </style>
 </head>
 <body>
-<div class="container">
+  <div class="container">
     <div id="ban-message">Ты за критику на 24 часа, будь лаской в следующий раз</div>
+
+    <!-- Форма регистрации -->
+    <div class="register-form" id="register-form">
+      <h2>Регистрация</h2>
+      <div class="form-group">
+        <label for="reg-email">Email:</label>
+        <input type="email" id="reg-email" placeholder="Введите email">
+      </div>
+      <div class="form-group">
+        <label for="reg-password">Пароль:</label>
+        <input type="password" id="reg-password" placeholder="Введите пароль">
+      </div>
+      <button id="register-btn" class="btn">Зарегистрироваться</button>
+      <p><a href="#" onclick="showLoginForm()">Уже есть аккаунт? Войти</a></p>
+    </div>
 
     <!-- Форма логина -->
     <div class="login-form" id="login-form">
-        <h2>Вход в ЯСамаяПи</h2>
-        <input type="text" id="username-input" placeholder="Введите имя пользователя" style="padding: 10px; width: 200px;">
-        <button id="login-btn" class="btn">Войти</button>
+      <h2>Вход в ЯСамаяПи</h2>
+      <div class="form-group">
+        <label for="login-email">Email:</label>
+        <input type="email" id="login-email" placeholder="Введите email">
+      </div>
+      <div class="form-group">
+        <label for="login-password">Пароль:</label>
+        <input type="password" id="login-password" placeholder="Введите пароль">
+      </div>
+      <button id="login-btn" class="btn">Войти</button>
+      <p><a href="#" onclick="showRegisterForm()">Нет аккаунта? Зарегистрироваться</a></p>
     </div>
 
     <!-- Вкладки -->
     <div>
-        <div class="tab active-tab" data-tab="main">Главная</div>
-        <div class="tab" data-tab="rating">Самые пиз***ые</div>
+      <div class="tab active-tab" data-tab="main">Главная</div>
+      <div class="tab" data-tab="rating">Самые пиз***ые</div>
+      <div class="tab" data-tab="deities">Прочие божества</div>
     </div>
 
     <!-- Основной контент -->
     <div id="main-tab" class="tab-content" style="display: block;">
-        <div class="video-section">
-            <h2>Твои видео</h2>
-            <video id="video1" class="video-preview" controls></video>
-            <video id="video2" class="video-preview" controls></video>
-            <div class="camera-section">
-                <button id="go-btn" class="btn">ГО</button>
-                <video id="camera-preview" autoplay muted class="video-preview"></video>
-                <div>
-                    <button id="switch-camera" class="btn">Переключить камеру</button>
-                    <button id="record-btn" class="btn">Записать</button>
-                </div>
-            </div>
+      <div class="video-section">
+        <h2>Твои видео</h2>
+        <video id="video1" class="video-preview" controls></video>
+        <video id="video2" class="video-preview" controls></video>
+        <div class="camera-section">
+          <button id="go-btn" class="btn">ГО</button>
+          <video id="camera-preview" autoplay muted class="video-preview"></video>
+          <div>
+            <button id="switch-camera" class="btn">Переключить камеру</button>
+            <button id="record-btn" class="btn">Записать</button>
+          </div>
         </div>
+      </div>
 
-        <div class="responses-section">
-            <h2>Ответы от других пользователей</h2>
-            <div id="responses"></div>
-            <h3>Оставить реакцию</h3>
-            <select id="reaction-type">
-                <option value="video">Видео</option>
-                <option value="audio">Аудио</option>
-                <option value="text">Текст</option>
-            </select>
-            <textarea id="reaction-content" placeholder="Напишите похвалу..." style="width: 100%; height: 60px;"></textarea>
-            <button id="send-reaction" class="btn">Отправить реакцию</button>
-        </div>
+      <div class="responses-section">
+        <h2>Ответы от других пользователей</h2>
+        <div id="responses"></div>
+        <h3>Оставить реакцию</h3>
+        <select id="reaction-type">
+          <option value="video">Видео</option>
+          <option value="audio">Аудио</option>
+          <option value="text">Текст</option>
+        </select>
+        <textarea id="reaction-content" placeholder="Напишите похвалу..." style="width: 100%; height: 60px;"></textarea>
+        <button id="send-reaction" class="btn">Отправить реакцию</button>
+      </div>
     </div>
 
     <!-- Вкладка рейтинга -->
     <div id="rating-tab" class="tab-content">
-        <h2>Самые пиз***ые пользователи</h2>
-        <div id="rating-list"></div>
+      <h2>Самые пиз***ые пользователи</h2>
+      <div id="rating-list"></div>
     </div>
-</div>
-<script src="app.js"></script>
+
+    <!-- Вкладка прочих божеств -->
+    <div id="deities-tab" class="tab-content">
+      <h2>Прочие божества</h2>
+      <div id="users-list"></div>
+    </div>
+  </div>
+  <script src="app.js"></script>
 </body>
 </html>
