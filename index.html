@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>ЯСамаяПи******</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f0f0; }
+        .container { max-width: 600px; margin: 20px auto; padding: 15px; }
+        .video-preview { width: 100%; margin: 10px 0; }
+        .btn { padding: 12px 24px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; background: #4CAF50; color: white; }
+        .camera-section { text-align: center; margin: 20px 0; }
+        .response-item { background: white; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        #ban-message { display: none; text-align: center; font-size: 18px; color: red; padding: 20px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="ban-message">Ты забанен за критику на 24 часа, будь лаской в следующий раз</div>
+
+    <div class="video-section">
+        <h2>Твои видео</h2>
+        <video id="video1" class="video-preview" controls></video>
+        <video id="video2" class="video-preview" controls></video>
+        <div class="camera-section">
+            <button id="go-btn" class="btn">ГО</button>
+            <video id="camera-preview" autoplay muted class="video-preview"></video>
+            <div>
+                <button id="switch-camera" class="btn">Переключить камеру</button>
+                <button id="record-btn" class="btn">Записать</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="responses-section">
+        <h2>Реакции</h2>
+        <div id="responses"></div>
+    </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
