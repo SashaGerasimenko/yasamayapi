@@ -6,35 +6,69 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #f0f0f0; }
-        .container { max-width: 600px; margin: 20px auto; padding: 15px; }
+        .container { max-width: 800px; margin: 20px auto; padding: 15px; }
         .video-preview { width: 100%; margin: 10px 0; }
         .btn { padding: 12px 24px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; background: #4CAF50; color: white; }
         .camera-section { text-align: center; margin: 20px 0; }
         .response-item { background: white; padding: 10px; margin: 10px 0; border-radius: 5px; }
         #ban-message { display: none; text-align: center; font-size: 18px; color: red; padding: 20px; }
+        .tab { padding: 10px; cursor: pointer; border: 1px solid #ddd; display: inline-block; }
+        .active-tab { background: #4CAF50; color: white; }
+        .tab-content { display: none; padding: 20px; border: 1px solid #ddd; margin-top: 10px; }
+        .login-form { text-align: center; padding: 20px; }
     </style>
 </head>
 <body>
 <div class="container">
-    <div id="ban-message">Ты забанен за критику на 24 часа, будь лаской в следующий раз</div>
+    <div id="ban-message">Ты за критику на 24 часа, будь лаской в следующий раз</div>
 
-    <div class="video-section">
-        <h2>Твои видео</h2>
-        <video id="video1" class="video-preview" controls></video>
-        <video id="video2" class="video-preview" controls></video>
-        <div class="camera-section">
-            <button id="go-btn" class="btn">ГО</button>
-            <video id="camera-preview" autoplay muted class="video-preview"></video>
-            <div>
-                <button id="switch-camera" class="btn">Переключить камеру</button>
-                <button id="record-btn" class="btn">Записать</button>
+    <!-- Форма логина -->
+    <div class="login-form" id="login-form">
+        <h2>Вход в ЯСамаяПи</h2>
+        <input type="text" id="username-input" placeholder="Введите имя пользователя" style="padding: 10px; width: 200px;">
+        <button id="login-btn" class="btn">Войти</button>
+    </div>
+
+    <!-- Вкладки -->
+    <div>
+        <div class="tab active-tab" data-tab="main">Главная</div>
+        <div class="tab" data-tab="rating">Самые пиз***ые</div>
+    </div>
+
+    <!-- Основной контент -->
+    <div id="main-tab" class="tab-content" style="display: block;">
+        <div class="video-section">
+            <h2>Твои видео</h2>
+            <video id="video1" class="video-preview" controls></video>
+            <video id="video2" class="video-preview" controls></video>
+            <div class="camera-section">
+                <button id="go-btn" class="btn">ГО</button>
+                <video id="camera-preview" autoplay muted class="video-preview"></video>
+                <div>
+                    <button id="switch-camera" class="btn">Переключить камеру</button>
+                    <button id="record-btn" class="btn">Записать</button>
+                </div>
             </div>
+        </div>
+
+        <div class="responses-section">
+            <h2>Ответы от других пользователей</h2>
+            <div id="responses"></div>
+            <h3>Оставить реакцию</h3>
+            <select id="reaction-type">
+                <option value="video">Видео</option>
+                <option value="audio">Аудио</option>
+                <option value="text">Текст</option>
+            </select>
+            <textarea id="reaction-content" placeholder="Напишите похвалу..." style="width: 100%; height: 60px;"></textarea>
+            <button id="send-reaction" class="btn">Отправить реакцию</button>
         </div>
     </div>
 
-    <div class="responses-section">
-        <h2>Реакции</h2>
-        <div id="responses"></div>
+    <!-- Вкладка рейтинга -->
+    <div id="rating-tab" class="tab-content">
+        <h2>Самые пиз***ые пользователи</h2>
+        <div id="rating-list"></div>
     </div>
 </div>
 <script src="app.js"></script>
