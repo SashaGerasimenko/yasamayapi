@@ -216,17 +216,169 @@ class YaSamayaPi {
     localStorage.setItem('users', JSON.stringify(users));
   }
 
+  setupReactionHandlers() {
+    document.getElementById('reaction-type').addEventListener('change', (e) => {
+      this.showReactionInput(e.target.value);
+    });
+  }
+
+  showReactionInput(type) {
+    const contentDiv = document.getElementById('reaction-content-container');
+    contentDiv.innerHTML = '';
+
+    switch (type) {
+      case 'video':
+        contentDiv.innerHTML = `
+          <button id="start-video-record" class="btn">Начать запись</button>
+          <button id="stop-video-record" class="btn" style="display: none;">Остановить запись</button>
+          <video id="recorded-video-preview" controls style="width: 100%; margin: 10px 0; display: none;"></video>
+          <div id="video-recording-status" style="color: red; margin: 10px 0;"></div>
+        `;
+        this.setupVideoRecording();
+        break;
+      case 'audio':
+        contentDiv.innerHTML = `
+          <button id="start-audio-record" class="btn">Начать запись</button>
+          <button id="stop-audio-record" class="btn" style="display: none;">Остановить запись</button>
+          <audio id="recorded-audio-preview" controls style="margin: 10px 0; display: none;"></audio>
+          <div id="audio-recording-status" style="color: red; margin: 10px 0;"></div>
+        `;
+        this.setupAudioRecording();
+        break;
+      case 'text':
+      default:
+        contentDiv.innerHTML = `
+          <textarea id="reaction-text" placeholder="Напишите похвалу..." style="width: 100%; height: 60px;"></textarea>
+        `;
+    }
+  }
+
+  setupVideoRecording() {
+    const startBtn = document.getElementById('start-video-record');
+    const stopBtn = document.getElementById('stop-video-record');
+    const preview = document.getElementById('recorded-video-preview');
+    const status = document.getElementById('video-recording-status');
+
+    let mediaRecorder;
+    let recordedChunks = [];
+
+    startBtn.addEventListener('click', async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        preview.srcObject = stream;
+        preview.style.display = 'block';
+
+        mediaRecorder = new MediaRecorder(stream);
+        recordedChunks = [];
+
+        mediaRecorder.ondataavailable = e => {
+          if (e.data.size > 0) recordedChunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(recordedChunks, { type: 'video/webm' });
+          const url = URL.createObjectURL(blob);
+          preview.src = url;
+          this.recordedVideoBlob = blob;
+          status.textContent = 'Запись завершена. Можно отправить реакцию.';
+        };
+
+        mediaRecorder.start();
+        startBtn.style.display = 'none';
+        stopBtn.style.display = 'block';
+        status.textContent = 'Идет запись...';
+      } catch (err) {
+        console.error('Ошибка доступа к камере:', err);
+        alert('Не удалось получить доступ к камере. Разрешите доступ в настройках браузера.');
+      }
+    });
+
+    stopBtn.addEventListener('click', () => {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+      stopBtn.style.display = 'none';
+    });
+  }
+
+  setupAudioRecording() {
+    const startBtn = document.getElementById('start-audio-record');
+    const stopBtn = document.getElementById('stop-audio-record');
+    const preview = document.getElementById('recorded-audio-preview');
+    const status = document.getElementById('audio-recording-status');
+
+    let mediaRecorder;
+    let recordedChunks = [];
+
+    startBtn.addEventListener('click', async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+        mediaRecorder = new MediaRecorder(stream);
+        recordedChunks = [];
+
+        mediaRecorder.ondataavailable = e => {
+          if (e.data.size > 0) recordedChunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(recordedChunks, { type: 'audio/wav' });
+          const url = URL.createObjectURL(blob);
+          preview.src = url;
+          preview.style.display = 'block';
+          this.recordedAudioBlob = blob;
+          status.textContent = 'Запись завершена. Можно отправить реакцию.';
+        };
+
+        mediaRecorder.start();
+        startBtn.style.display = 'none';
+        stopBtn.style.display = 'block';
+        status.textContent = 'Идет запись...';
+      } catch (err) {
+        console.error('Ошибка доступа к микрофону:', err);
+        alert('Не удалось получить доступ к микрофону. Разрешите доступ в настройках браузера.');
+      }
+    });
+
+    stopBtn.addEventListener('click', () => {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+      stopBtn.style.display = 'none';
+    });
+  }
+
   sendReaction() {
     if (this.isBanned) return;
 
     const type = document.getElementById('reaction-type').value;
-    const content = document.getElementById('reaction-content').value;
+    let content;
 
-    if (!content) {
-      alert('Введите текст реакции!');
-      return;
+    switch (type) {
+      case 'video':
+        if (!this.recordedVideoBlob) {
+          alert('Сначала запишите видео!');
+          return;
+        }
+        content = URL.createObjectURL(this.recordedVideoBlob);
+        break;
+      case 'audio':
+        if (!this.recordedAudioBlob) {
+          alert('Сначала запишите аудио!');
+          return;
+        }
+        content = URL.createObjectURL(this.recordedAudioBlob);
+        break;
+      case 'text':
+        content = document.getElementById('reaction-text').value;
+        if (!content) {
+          alert('Введите текст реакции!');
+          return;
+        }
+        break;
     }
 
+    // Получаем все видео текущего пользователя
     const allUsers = JSON.parse(localStorage.getItem('users'));
     const userVideos = allUsers[this.currentUser.email]?.videos || [];
 
@@ -235,6 +387,7 @@ class YaSamayaPi {
       return;
     }
 
+    // Берём последнее видео для реакции
     const targetVideo = userVideos[userVideos.length - 1];
 
     const reaction = {
@@ -248,11 +401,16 @@ class YaSamayaPi {
     targetVideo.reactions.push(reaction);
     this.updateUserVideos();
 
+    // Обновляем счётчик реакций пользователя
     this.incrementReactionCount(this.currentUser.email);
 
-    document.getElementById('reaction-content').value = '';
+    // Очищаем записи
+    this.recordedVideoBlob = null;
+    this.recordedAudioBlob = null;
+
     this.renderResponses();
   }
+
 
   incrementReactionCount(username) {
     const reactionCounts = JSON.parse(localStorage.getItem('userReactionsCount')) || {};
@@ -434,3 +592,4 @@ document.addEventListener('DOMContentLoaded', () => {
     app.switchTab('rating');
   }
 });
+
